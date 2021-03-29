@@ -19,9 +19,27 @@
 ### 程序功能
 
 * 实现了 Enigma 类用于模拟 Enigma 机，支持五种转子、插线板、ring setting、初始位置的设置，完整按照 Enigma 机实现（包括有 double-stepping 特性）；
+* 实现了 LoopAnalyzer 类用于辅助 loop 分析；
 * 实现了 Bombe 类参照 Bombe 机算法进行破解，注意这里指定了要破解的 Enigma 机的 ring setting；
 
 ### 程序使用
+
+* 在 enigma.py 中修改 `__main__` 下的代码，运行 `python enigma.py` 即可模拟 Enigma 机加密过程，可用于辅助分析；
+* 设置 input.json，运行 `python loop_analyzer.py` 即可辅助进行环分析，input.json 必要内容如下：
+
+```json
+{
+  "index": 3,
+  "plaintext": "ABBC",
+  "ciphertext": "DCCA"
+}
+```
+
+* 设置 loops.json，运行 `python bombe.py` 即可模拟 bombe 机运行，loops.json 格式如下：
+
+```json
+
+```
 
 
 ## Enigma 机
@@ -101,4 +119,7 @@ V: 'VZBRGITYUPSDNHLXAWMJQOFECK'
 
 由 36*3 个转子，即 36 个模拟的 Enigma 机（称为 Scrambler）组成，分为了三排，每排 12 个 Scrambler。不同排可以运行不同的转子设置和顺序，而每一排可以通过接线设置多个 loop （即从 crib 中分析得到的 loop）。
 
-在这里实现时，直接
+在这里实现时，分为了两部分：loop 和插线板映射唯一性判断。为了方便描述，将明文和密文这些能够直接看到的称为“插线板外的字符“，经过一次插线板后称为“插线板内的字符”。
+
+* Loop：即课程 PPT 上写的内容，将字母作为结点，对应的明密文字母连线，找到一个所在环最多的字母 A，对它经过插线板后的字母 X 进行枚举 —— 注意 X 在依次经过环之后应当保持不变；
+* 映射唯一性判断：Loop 枚举过程中，会对于确定的一个字母 A 枚举经过插线板后得到的字母 X，此时其实可以得到整个连通图的插线板内字符，也就能得到插线板的其它位置映射关系，此时判断一下映射唯一性即可。
