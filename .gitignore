@@ -1,4 +1,7 @@
 .idea/
 **/*.swp
 **/*~
+log.txt
+Graph.gv
+Graph.gv.pdf
 __pycache__/
