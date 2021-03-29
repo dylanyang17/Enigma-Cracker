@@ -137,11 +137,6 @@ class Enigma:
         """
         return chr(ord('A') + ind % 26)
 
-    def _next_position(self):
-        """
-        将 position 切换到下一个位置
-        """
-
 
 if __name__ == '__main__':
     enigma = Enigma((1, 2, 3), 'DOE', 'MDV', default_plug_board)
