@@ -13,4 +13,4 @@ reflector = 'YRUHQSLDPXNGOKMIEBFZCWVJAT'  # UKW-B
 
 rotor_notches = ['', 'Q', 'E', 'V', 'J', 'Z']
 
-crib_path = 'crib.json'
+input_path = 'input.json'

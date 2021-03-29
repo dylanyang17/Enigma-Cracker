@@ -133,7 +133,7 @@ class Enigma:
 
 
 if __name__ == '__main__':
-    enigma = Enigma((1, 2, 3), 'DOE', 'MDV', default_plug_board)
-    while True:
-        c = input().upper()
-        print(enigma.press(c))
+    enigma = Enigma((1, 2, 3), 'AAA', 'OSH', default_plug_board)
+    s = 'TSINGHUAUNIVERSITY'
+    for c in s:
+        print(enigma.press(c), end='')
