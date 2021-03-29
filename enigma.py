@@ -1,11 +1,5 @@
 from constants import rotor_notches, default_rotor_circuits, default_plug_board, reflector
-import logging
-
-logging.basicConfig(
-    format="[%(asctime)s] %(message)s",
-    datefmt="%d-%m-%Y %H:%M:%S",
-    level=logging.DEBUG,
-)
+from logger import logger
 
 
 class Enigma:
@@ -88,7 +82,7 @@ class Enigma:
         for i in range(3):
             tmp_position += self._index_to_char((self._char_to_index(self.position[i]) + rot[i]) % 26)
         self.position = tmp_position
-        logging.debug('rot: ' + rot.__str__() + '. now: ' + self.position)
+        logger.debug('rot: ' + rot.__str__() + '. now: ' + self.position)
 
     def press(self, c):
         """

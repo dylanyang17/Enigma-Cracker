@@ -12,3 +12,5 @@ default_plug_board = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 reflector = 'YRUHQSLDPXNGOKMIEBFZCWVJAT'  # UKW-B
 
 rotor_notches = ['', 'Q', 'E', 'V', 'J', 'Z']
+
+crib_path = 'crib.json'

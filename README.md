@@ -6,7 +6,23 @@
 
 * 知乎关于 Enigma 机及其破解的讲解：https://www.zhihu.com/question/28397034
 * Enigma 机模拟器：https://www.101computing.net/enigma-machine-emulator
-* Wiki：https://en.wikipedia.org/wiki/Enigma_machine
+* 关于 Bombe 机的详细讲解：https://www.mpoweruk.com/enigma.htm
+* Wiki 上的 Enigma 机：https://en.wikipedia.org/wiki/Enigma_machine
+* Wiki 上的 Enigma 机破解分析：https://en.wikipedia.org/wiki/Cryptanalysis_of_the_Enigma
+
+## 程序设计
+
+### 运行环境
+
+* 运行 LoopAnalyzer 需要在系统和 python 中均安装 Graphviz，并且将 Graphviz 放入 PATH 系统变量。Graphviz：http://www.graphviz.org/download/
+
+### 程序功能
+
+* 实现了 Enigma 类用于模拟 Enigma 机，支持五种转子、插线板、ring setting、初始位置的设置，完整按照 Enigma 机实现（包括有 double-stepping 特性）；
+* 实现了 Bombe 类参照 Bombe 机算法进行破解，注意这里指定了要破解的 Enigma 机的 ring setting；
+
+### 程序使用
+
 
 ## Enigma 机
 
@@ -48,6 +64,22 @@ IV：J
 V：Z
 ```
 
+五种转子转芯的映射：
+
+```
+I: 'EKMFLGDQVZNTOWYHXUSPAIBRCJ'
+II: 'AJDKSIRUXBLHWTMCQGZNPYFVOE'
+III: 'BDFHJLCPRTXVZNYEIWGAKMUSQO'
+IV: 'ESOVPZJAYQUIRHXLNFTGKDCMWB'
+V: 'VZBRGITYUPSDNHLXAWMJQOFECK'
+```
+
+这里使用的 UKW-B 反射器：
+
+```
+'YRUHQSLDPXNGOKMIEBFZCWVJAT'
+```
+
 ### 加密
 
 操作员加密的步骤为：
@@ -68,3 +100,5 @@ V：Z
 ## Bombe 机
 
 由 36*3 个转子，即 36 个模拟的 Enigma 机（称为 Scrambler）组成，分为了三排，每排 12 个 Scrambler。不同排可以运行不同的转子设置和顺序，而每一排可以通过接线设置多个 loop （即从 crib 中分析得到的 loop）。
+
+在这里实现时，直接
