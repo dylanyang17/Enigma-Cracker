@@ -66,7 +66,7 @@
 
 运行 `python loop_analyzer.py` 得到图如下（此时暂未使用 offset 和 ring_setting）：
 
-![loop_analyze](D:\Work\Enigma-Cracker\res\loop_analyze.png)
+![loop_analyze](res\loop_analyze.png)
 
 发现字母 U 所在环最多（有两个），所以更新 input.json 如下：
 
