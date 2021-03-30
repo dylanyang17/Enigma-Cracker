@@ -1,8 +1,9 @@
 import json
+import time
 import itertools
 from collections import deque
 
-from constants import input_path
+from constants import input_path, output_path
 from enigma import Enigma
 from constants import default_plug_board
 from logger import logger
@@ -50,40 +51,48 @@ class Bombe:
         for enigma in self.enigmas:
             enigma.rotate()
 
-    def check(self, c):
+    def check(self, checking_letter):
         """
         BFS 检验中心字符经过插线板后能否变为 c，也就是检验了映射唯一性和 loop，检验成功则返回 Ture 和推导出的映射关系，否则返回 False 和 None
         """
-        plug_board = {self.central_letter: c, c: self.central_letter}
-        visit = {self.central_letter: True, c: True}
+        plug_board = {self.central_letter: checking_letter, checking_letter: self.central_letter}
+        indexes = {}  # 用于存储每个字母出现的位置，加速搜索，每一项形如 'T': [(0/1, pos)] 表示在明/密文中的 pos 位置出现
+        for i in range(2):  # 枚举是明文还是密文
+            for pos in range(len(self.texts[i])):  # 枚举明密文内容
+                c = self.texts[i][pos]
+                tmp_indexes = indexes.get(c, [])
+                tmp_indexes.append((i, pos))
+                indexes[c] = tmp_indexes
+
+        visit = {self.central_letter: True, checking_letter: True}
         queue = deque()
         queue.append(self.central_letter)
-        if c != self.central_letter:
-            queue.append(c)
+        if checking_letter != self.central_letter:
+            queue.append(checking_letter)
         while len(queue) > 0:
             a = queue.popleft()
-            for i in range(2):  # 枚举是明文还是密文
-                for pos in range(len(self.texts[i])):  # 枚举明密文内容
-                    if self.texts[i][pos] == a:
-                        x = plug_board[a]
-                        y = self.enigmas[pos].through_all(x)
-                        b = self.texts[i ^ 1][pos]
-                        if (plug_board.get(y) is not None and plug_board[y] != b) \
-                                or (plug_board.get(b) is not None and plug_board[b] != y):
-                            return False, None
-                        plug_board[y] = b
-                        plug_board[b] = y
-                        if not visit.get(b, False):
-                            visit[b] = True
-                            queue.append(b)
-                        if not visit.get(y, False):
-                            visit[y] = True
-                            queue.append(y)
+            tmp_indexes = indexes.get(a, [])
+            for (i, pos) in tmp_indexes:
+                x = plug_board[a]
+                y = self.enigmas[pos].through_all(x)
+                b = self.texts[i ^ 1][pos]
+                if (plug_board.get(y) is not None and plug_board[y] != b) \
+                        or (plug_board.get(b) is not None and plug_board[b] != y):
+                    return False, None
+                plug_board[y] = b
+                plug_board[b] = y
+                if not visit.get(b, False):
+                    visit[b] = True
+                    queue.append(b)
+                if not visit.get(y, False):
+                    visit[y] = True
+                    queue.append(y)
         return True, plug_board
 
     def run(self):
-        logger.info(f'Bombe running... rotors: {self.rotors}, ring_setting: {self.ring_setting}')
+        logger.debug(f'Bombe running... rotors: {self.rotors}, ring_setting: {self.ring_setting}')
         settings = []
+        start_time = time.time()
         while True:
             for i in range(ord('A'), ord('Z') + 1):
                 c = chr(i)
@@ -100,6 +109,7 @@ class Bombe:
             self.rotate()
             if self.guess_position == self.initial_position:
                 break
+        logger.debug(f'All positions are enumerated. time consumption: {time.time()-start_time}, rotors: {self.rotors}, ring_setting: {self.ring_setting}')
         return settings
 
 
@@ -115,8 +125,8 @@ class Cracker:
 if __name__ == '__main__':
     with open(input_path, 'r') as f:
         args = json.load(f)
-        # bombe = Bombe([1, 2, 3], args['ring_setting'], args['offset'], args['plaintext'], args['ciphertext'], 'R',
-        #               'AAA')
-        # bombe.run()
         cracker = Cracker()
-        print(cracker.run(args['ring_setting'], args['offset'], args['plaintext'], args['ciphertext'], args['central_letter']))
+        settings = cracker.run(args['ring_setting'], args['offset'], args['plaintext'], args['ciphertext'], args['central_letter'])
+        logger.info(f'Cracker finished. Output: {settings}')
+        with open(output_path, 'w') as fw:
+            json.dump(settings, fw)

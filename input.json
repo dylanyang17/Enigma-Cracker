@@ -1,8 +1,8 @@
 {
-  "ring_setting": "AAA",
-  "offset": 0,
+  "ring_setting": "FEN",
+  "offset": 5,
   "plaintext": "TSINGHUAUNIVERSITY",
-  "ciphertext": "RPQKXLRREREDLHURRQ",
-  "central_letter": "R",
-  "ans": "AAA OSH"
+  "ciphertext": "UUXQHFTSVFDUTXOYQV",
+  "central_letter": "U",
+  "ans": "341 FEN SCM->SDR (offset)"
 }

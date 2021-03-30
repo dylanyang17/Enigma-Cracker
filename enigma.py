@@ -1,3 +1,4 @@
+import string
 from constants import rotor_notches, default_rotor_circuits, default_plug_board, reflector
 from logger import logger
 
@@ -82,7 +83,7 @@ class Enigma:
         for i in range(3):
             tmp_position += self._index_to_char((self._char_to_index(self.position[i]) + rot[i]) % 26)
         self.position = tmp_position
-        logger.debug('rot: ' + rot.__str__() + '. now: ' + self.position)
+        # logger.debug('rot: ' + rot.__str__() + '. now: ' + self.position)
 
     def press(self, c):
         """
@@ -131,9 +132,31 @@ class Enigma:
         """
         return chr(ord('A') + ind % 26)
 
+    @staticmethod
+    def gen_plug_board_arg(d):
+        """
+        传入一个词典，自动转为 plug_board 输入格式，便于手动输入
+        """
+        assert type(d) == dict
+        tmp_d = d.copy()
+        for k, v in tmp_d.items():
+            if d.get(v) is not None:
+                assert d[v] == k
+            else:
+                d[v] = k
+        plug_board = ''
+        for c in string.ascii_uppercase:
+            if d.get(c) is None:
+                plug_board += c
+            else:
+                plug_board += d[c]
+        return plug_board
+
 
 if __name__ == '__main__':
-    enigma = Enigma((1, 2, 3), 'AAA', 'OSH', default_plug_board)
-    s = 'TSINGHUAUNIVERSITY'
+    enigma = Enigma((3, 4, 1), 'FEN', 'SCM', Enigma.gen_plug_board_arg({'W': 'L', 'E': 'V', 'R': 'Z', 'T': 'F',
+                                                                        'G': 'P', 'I': 'M', 'A': 'B', 'S': 'N',
+                                                                        'D': 'H', 'K': 'C'}))
+    s = 'ILOVETSINGHUAUNIVERSITY'
     for c in s:
         print(enigma.press(c), end='')

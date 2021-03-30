@@ -21,11 +21,12 @@
 * 实现了 Enigma 类用于模拟 Enigma 机，支持五种转子、插线板、ring setting、初始位置的设置，完整按照 Enigma 机实现（包括有 double-stepping 特性）；
 * 实现了 LoopAnalyzer 类用于辅助 loop 分析；
 * 实现了 Bombe 类参照 Bombe 机算法进行破解，注意这里指定了要破解的 Enigma 机的 ring setting；
+* 在破解的结果中，**除了得到转子类型和顺序，还会尽可能还原 plug_board**，如果有一些未还原的插线板配置，则可以很容易通过词汇比较的方式得到还原。
 
 ### 程序使用
 
-* 在 enigma.py 中修改 `__main__` 下的代码，运行 `python enigma.py` 即可模拟 Enigma 机加密过程，可用于辅助分析；
-* 设置 input.json，运行 `python loop_analyzer.py` 即可辅助进行环分析，input.json 必要内容如下：
+* 【额外功能：在 enigma.py 中修改 `__main__` 下的代码，运行 `python enigma.py` 即可模拟 Enigma 机加密过程，可用于辅助分析】；
+* 设置 input.json，运行 `python loop_analyzer.py` 即可辅助进行环分析，input.json 必要内容如下
 
 ```json
 {
@@ -34,12 +35,58 @@
 }
 ```
 
-* 设置 loops.json，运行 `python bombe.py` 即可模拟 bombe 机运行，loops.json 格式如下：
+* 设置 input.json，运行 `python bombe.py` 即可模拟 bombe 机运行，input.json 格式如下：
 
 ```json
-
+{
+  "ring_setting": "FEN",
+  "offset": 5,
+  "plaintext": "TSINGHUAUNIVERSITY",
+  "ciphertext": "UUXQHFTSVFDUTXOYQV",
+  "central_letter": "U"
+}
 ```
 
+其中 central_letter 即寻找到的所在环最多的结点。
+
+### 运行实例
+
+假设加密文档为：`UZDTIUUXQHFTSVFDUTXOYQV`，在文档第六个字母处找到了一个 crib，对应明文为 "TSINGHUAUNIVERSITY"，密文为 "UUXQHFTSVFDUTXOYQV"
+
+若已知 ring_setting 为 "FEN"，则设定 input.json 如下：
+
+```json
+{
+  "offset": 5,
+  "ring_setting": "FEN",
+  "plaintext": "TSINGHUAUNIVERSITY",
+  "ciphertext": "UUXQHFTSVFDUTXOYQV"
+}
+```
+
+运行 `python loop_analyzer.py` 得到图如下（此时暂未使用 offset 和 ring_setting）：
+
+![loop_analyze](D:\Work\Enigma-Cracker\res\loop_analyze.png)
+
+发现字母 U 所在环最多（有两个），所以更新 input.json 如下：
+
+```json
+{
+  "offset": 5,
+  "ring_setting": "FEN",
+  "plaintext": "TSINGHUAUNIVERSITY",
+  "ciphertext": "UUXQHFTSVFDUTXOYQV",
+  "central_letter": "U"
+}
+```
+
+运行 `python bombe.py` 进行运算，大约 18 秒运行一个设置，也就是 18 分钟之内能够枚举完所有 60 个设置。在运行到 \[3, 4, 1\] 这个转子顺序时，程序输出了：
+
+```
+INFO - {'rotors': [3, 4, 1], 'ring_setting': 'FEN', 'position': 'SCM', 'plug_board': {'U': 'U', 'F': 'T', 'T': 'F', 'E': 'V', 'V': 'E', 'N': 'S', 'S': 'N', 'Q': 'Q', 'D': 'H', 'H': 'D', 'Y': 'Y', 'O': 'O', 'B': 'A', 'A': 'B', 'P': 'G', 'G': 'P', 'M': 'I', 'I': 'M', 'X': 'X', 'Z': 'R', 'R': 'Z'}}
+```
+
+表示一个可能的设置，按照该设置，对原文档 `UZDTIUUXQHFTSVFDUTXOYQV` 还原出的文档为：`ILOVETSINGHUAUNIVERSITY`，解密成功。并且实际上程序只找到了这一个可能的设置。
 
 ## Enigma 机
 
